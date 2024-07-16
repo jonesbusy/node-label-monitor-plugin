@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+    Node Label Monitor plugin to monitor and disconnect nodes in Jenkins matching specific labels
+</div>
