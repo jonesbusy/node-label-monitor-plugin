@@ -3,6 +3,7 @@ package io.jenkins.plugins.nodelabelmonitor;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.Computer;
+import hudson.model.Node;
 import hudson.model.TaskListener;
 import hudson.node_monitors.NodeMonitor;
 import hudson.remoting.Channel;
@@ -20,7 +21,18 @@ public class ForbiddenLabelListener extends ComputerListener {
     public void preOnline(Computer c, Channel channel, FilePath root, TaskListener listener)
             throws IOException, InterruptedException {
         refreshMonitor();
-        LOGGER.log(Level.FINE, "preOnline() for forbidden label. Monitor refreshed");
+        LOGGER.log(
+                Level.FINE,
+                String.format("preOnline() for node '%s' forbidden label. Monitor refreshed", c.getDisplayName()));
+        Node node = c.getNode();
+        if (node == null) {
+            return;
+        }
+        LOGGER.log(
+                Level.FINE,
+                String.format(
+                        "Node '%s' as assigned labels '%s' is online",
+                        node.getDisplayName(), node.getAssignedLabels()));
     }
 
     @Override
@@ -32,13 +44,7 @@ public class ForbiddenLabelListener extends ComputerListener {
     private void refreshMonitor() {
         NodeMonitor.getAll().stream()
                 .filter(nm -> nm instanceof ForbiddenLabelMonitor)
-                .forEach(nm -> {
-                    try {
-                        Thread thread = nm.triggerUpdate();
-                        thread.join();
-                    } catch (InterruptedException e) {
-                        LOGGER.log(Level.WARNING, "Error refreshing monitor", e);
-                    }
-                });
+                .map(nm -> (ForbiddenLabelMonitor) nm)
+                .forEach(ForbiddenLabelMonitor::waitForUpdate);
     }
 }

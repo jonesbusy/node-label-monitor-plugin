@@ -23,6 +23,17 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
     @DataBoundConstructor
     public ForbiddenLabelMonitor() {}
 
+    public void waitForUpdate() {
+        LOGGER.log(Level.FINE, "Trigger label monitor update");
+        Thread thread = this.triggerUpdate();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            LOGGER.log(Level.WARNING, "Thread interrupted", e);
+        }
+        LOGGER.log(Level.FINE, "Label monitor updated");
+    }
+
     @Extension
     @Symbol("forbiddenLabel")
     public static class DescriptorImpl extends AbstractNodeMonitorDescriptor<Boolean> {

@@ -1,7 +1,9 @@
 package io.jenkins.plugins.nodelabelmonitor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 
 import io.jenkins.plugins.casc.misc.ConfiguredWithCode;
 import io.jenkins.plugins.casc.misc.JenkinsConfiguredWithCodeRule;
@@ -13,7 +15,7 @@ public class ConfigurationAsCodeTest {
 
     @Test
     @ConfiguredWithCode("configuration-as-code.yml")
-    public void should_support_configuration_as_code(JenkinsConfiguredWithCodeRule rule) throws Exception {
+    public void shouldSupportConfigurationAsCode(JenkinsConfiguredWithCodeRule rule) throws Exception {
 
         // Assert properties
         assertThat(rule.getInstance().getLabelAtom("24.04").getProperties(), emptyIterable());
