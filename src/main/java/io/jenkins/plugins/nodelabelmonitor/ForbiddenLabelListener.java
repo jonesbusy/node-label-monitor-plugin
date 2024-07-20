@@ -31,8 +31,18 @@ public class ForbiddenLabelListener extends ComputerListener {
         LOGGER.log(Level.FINE, "onConfigurationChange() for forbidden label. Monitor refreshed");
     }
 
-    public void refreshMonitor() {
-        NodeMonitor.getAll().stream().filter(nm -> nm instanceof ForbiddenLabelMonitor).forEach(NodeMonitor::triggerUpdate);
+    private void refreshMonitor() {
+        NodeMonitor.getAll().stream().filter(nm -> nm instanceof ForbiddenLabelMonitor).forEach(
+                nm -> {
+                    try {
+                        Thread thread = nm.triggerUpdate();
+                        thread.join();
+                    }
+                    catch (InterruptedException e) {
+                        LOGGER.log(Level.WARNING, "Error refreshing monitor", e);
+                    }
+                }
+        );
     }
 
 }
