@@ -49,6 +49,22 @@
     </dependencies>
   </dependencyManagement>
 
+  <dependencies>
+
+    <!-- Typical usage is with JCasC to preconfigure label and platformlabeler to get dynamic labels. But not mandatory -->
+    <dependency>
+      <groupId>io.jenkins</groupId>
+      <artifactId>configuration-as-code</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>platformlabeler</artifactId>
+      <version>2617.v5444054f5e35</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>
