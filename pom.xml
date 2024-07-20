@@ -64,6 +64,12 @@
       <artifactId>test-harness</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>platformlabeler</artifactId>
+      <version>2617.v5444054f5e35</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
