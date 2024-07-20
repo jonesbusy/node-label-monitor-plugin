@@ -8,8 +8,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public class ForbiddenLabelProperty extends LabelAtomProperty {
 
     @DataBoundConstructor
-    public ForbiddenLabelProperty() {
-    }
+    public ForbiddenLabelProperty() {}
 
     @Extension
     public static class DescriptorImpl extends LabelAtomPropertyDescriptor {
@@ -17,7 +16,5 @@ public class ForbiddenLabelProperty extends LabelAtomProperty {
         public String getDisplayName() {
             return "Forbidden Label";
         }
-
     }
-
 }

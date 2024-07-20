@@ -1,7 +1,6 @@
 package io.jenkins.plugins.nodelabelmonitor;
 
 import hudson.slaves.ComputerListener;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +12,4 @@ public class ForbiddenLabelListener extends ComputerListener {
     public void onConfigurationChange() {
         LOGGER.log(Level.FINE, "onConfigurationChange() for forbidden label. Refreshing monitor");
     }
-
 }
- 
