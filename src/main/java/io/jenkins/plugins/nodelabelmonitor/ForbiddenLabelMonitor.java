@@ -10,6 +10,7 @@ import hudson.node_monitors.MonitorOfflineCause;
 import hudson.node_monitors.NodeMonitor;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.export.Exported;
 
 import java.io.IOException;
 import java.util.Set;
@@ -34,21 +35,25 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
             if (node == null) {
                 return Boolean.FALSE;
             }
-            LOGGER.log(Level.FINE, "Monitoring Node '{0}' for forbidden labels...", new Object[]{node.getDisplayName()});
+            if (node.getDisplayName().equals("Jenkins")) {
+                LOGGER.log(Level.FINE, String.format("Ignoring Jenkins Node '%s' for labels", node.getDisplayName()));
+                return Boolean.FALSE;
+            }
+            LOGGER.log(Level.FINE, String.format("Monitoring Node '%s' for forbidden labels...", node.getDisplayName()));
             Set<LabelAtom> assignedLabels = node.getAssignedLabels();
             for(LabelAtom labelAtom : assignedLabels) {
                 ForbiddenLabelProperty property = labelAtom.getProperties().get(ForbiddenLabelProperty.class);
                 if (property == null) {
-                    LOGGER.log(Level.FINE, "Skipping label '{0}' for Node '{1}'", new Object[]{labelAtom, node.getDisplayName()});
+                    LOGGER.log(Level.FINE, String.format("Skipping label '%s' for Node '%s'", labelAtom, node.getDisplayName()));
                     continue;
                 }
                 if (!isIgnored()) {
                     markOffline(c, new ForbiddenLabelCause("Node is assigned a forbidden label: " + labelAtom.getDisplayName()));
-                    LOGGER.log(Level.FINE, "Node '{0}' is assigned a forbidden label: '{1}'", new Object[]{node.getDisplayName(), labelAtom.getDisplayName()});
+                    LOGGER.log(Level.FINE, String.format("Node '%s' is assigned a forbidden label: %s", node.getDisplayName(), labelAtom.getDisplayName()));
                     return Boolean.TRUE;
                 }
             }
-            LOGGER.log(Level.FINE, "Reseting Node '{0}' to online state", new Object[]{node.getDisplayName()});
+            LOGGER.log(Level.FINE, "Reseting Node '%s' to online state", node.getDisplayName());
             c.setTemporarilyOffline(false, null);
             return Boolean.FALSE;
         }
@@ -72,6 +77,13 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
         public Class<? extends NodeMonitor> getTrigger() {
             return ForbiddenLabelMonitor.class;
         }
+
+        @Override
+        @Exported(name = "description")
+        public String toString() {
+            return message;
+        }
+
     }
 
 }
