@@ -17,7 +17,10 @@ import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 public class AgentTest {
 
     @Rule
-    public LoggerRule logs = new LoggerRule().record("io.jenkins.plugins.nodelabelmonitor", Level.FINEST);
+    public LoggerRule logs = new LoggerRule()
+            .record("io.jenkins.plugins.nodelabelmonitor", Level.FINEST)
+            .record("hudson.node_monitors", Level.FINEST)
+            .record("org.jvnet.hudson.plugins.platformlabeler", Level.FINEST);
 
     @Test
     public void shouldAcceptTasks(JenkinsRule rule) throws Exception {
