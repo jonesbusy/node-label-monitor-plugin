@@ -55,22 +55,22 @@ public class ForbiddenLabelListener extends ComputerListener {
 
     @Override
     public void onConfigurationChange() {
-        refreshMonitor();
+        triggerMonitorUpdate();
     }
 
     @Override
     public void onOffline(@NonNull Computer c, OfflineCause cause) {
-        refreshMonitor();
+        triggerMonitorUpdate();
     }
 
     @Override
     public void onTemporarilyOffline(Computer c, OfflineCause cause) {
-        refreshMonitor();
+        triggerMonitorUpdate();
     }
 
     @Override
     public void onTemporarilyOnline(Computer c) {
-        refreshMonitor();
+        triggerMonitorUpdate();
     }
 
     private void refreshMonitor() {
@@ -78,5 +78,12 @@ public class ForbiddenLabelListener extends ComputerListener {
                 .filter(nm -> nm instanceof ForbiddenLabelMonitor)
                 .map(nm -> (ForbiddenLabelMonitor) nm)
                 .forEach(ForbiddenLabelMonitor::waitForUpdate);
+    }
+
+    private void triggerMonitorUpdate() {
+        NodeMonitor.getAll().stream()
+                .filter(nm -> nm instanceof ForbiddenLabelMonitor)
+                .map(nm -> (ForbiddenLabelMonitor) nm)
+                .forEach(ForbiddenLabelMonitor::triggerUpdate);
     }
 }
