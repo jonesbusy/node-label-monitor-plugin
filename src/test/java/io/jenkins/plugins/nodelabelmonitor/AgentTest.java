@@ -26,6 +26,10 @@ public class AgentTest {
     public void shouldAcceptTasks(JenkinsRule rule) throws Exception {
         rule.createOnlineSlave(Label.get("foobar"));
 
+        // Grace period of NodeMonitorUpdater
+        // https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/hudson/node_monitors/NodeMonitorUpdater.java#L60
+        Thread.sleep(6000);
+
         // Computer should be online
         assertThat(rule.getInstance().getComputer("slave0").isOnline(), equalTo(true));
     }
@@ -36,6 +40,10 @@ public class AgentTest {
         rule.getInstance().getLabelAtom("barfoo").getProperties().add(new ForbiddenLabelProperty());
         assertThat(rule.getInstance().getLabelAtom("barfoo").getProperties().size(), equalTo(1));
         rule.createSlave(Label.get("barfoo"));
+
+        // Grace period of NodeMonitorUpdater
+        // https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/hudson/node_monitors/NodeMonitorUpdater.java#L60
+        Thread.sleep(6000);
 
         // Computer should be offline
         Computer computer = rule.getInstance().getComputer("slave0");
@@ -49,6 +57,10 @@ public class AgentTest {
         rule.getInstance().getLabelAtom("Linux").getProperties().add(new ForbiddenLabelProperty());
         rule.getInstance().getLabelAtom("Windows").getProperties().add(new ForbiddenLabelProperty());
         rule.createSlave(); // Don't assign any label
+
+        // Grace period of NodeMonitorUpdater
+        // https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/hudson/node_monitors/NodeMonitorUpdater.java#L60
+        Thread.sleep(6000);
 
         // Computer should be offline
         Computer computer = rule.getInstance().getComputer("slave0");
