@@ -34,19 +34,30 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
         LOGGER.log(Level.FINE, "Label monitor updated");
     }
 
-    @Extension
+    @Extension(ordinal = Integer.MAX_VALUE)
     @Symbol("forbiddenLabel")
-    public static class DescriptorImpl extends AbstractNodeMonitorDescriptor<Boolean> {
+    public static class DescriptorImpl extends AbstractNodeMonitorDescriptor<LabelAtom> {
+
+        public void markOfflineIfNotIgnored(Computer c, String message) {
+            if (!isIgnored()) {
+                markOffline(c, new ForbiddenLabelCause(message));
+            }
+        }
+
+        public LabelAtom monitorSynchronous(Computer c) throws IOException, InterruptedException {
+            LOGGER.log(Level.FINE, "Synchronous monitoring of forbidden labels");
+            return monitor(c);
+        }
 
         @Override
-        protected Boolean monitor(Computer c) throws IOException, InterruptedException {
+        protected LabelAtom monitor(Computer c) throws IOException, InterruptedException {
             Node node = c.getNode();
             if (node == null) {
-                return Boolean.FALSE;
+                return null;
             }
             if (node.getDisplayName().equals("Jenkins")) {
                 LOGGER.log(Level.FINE, String.format("Ignoring Jenkins Node '%s' for labels", node.getDisplayName()));
-                return Boolean.FALSE;
+                return null;
             }
             LOGGER.log(
                     Level.FINE, String.format("Monitoring Node '%s' for forbidden labels...", node.getDisplayName()));
@@ -59,22 +70,17 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
                             String.format("Skipping label '%s' for Node '%s'", labelAtom, node.getDisplayName()));
                     continue;
                 }
-                if (!isIgnored()) {
-                    markOffline(
-                            c,
-                            new ForbiddenLabelCause(
-                                    "Node is assigned a forbidden label: " + labelAtom.getDisplayName()));
-                    LOGGER.log(
-                            Level.FINE,
-                            String.format(
-                                    "Node '%s' is assigned a forbidden label: %s",
-                                    node.getDisplayName(), labelAtom.getDisplayName()));
-                    return Boolean.TRUE;
-                }
+                markOfflineIfNotIgnored(c, "Node is assigned a forbidden label: " + labelAtom.getDisplayName());
+                LOGGER.log(
+                        Level.FINE,
+                        String.format(
+                                "Node '%s' is assigned a forbidden label: %s",
+                                node.getDisplayName(), labelAtom.getDisplayName()));
+                return labelAtom;
             }
             LOGGER.log(Level.FINE, "Reseting Node '%s' to online state", node.getDisplayName());
             c.setTemporarilyOffline(false, null);
-            return Boolean.FALSE;
+            return null;
         }
 
         @NonNull
