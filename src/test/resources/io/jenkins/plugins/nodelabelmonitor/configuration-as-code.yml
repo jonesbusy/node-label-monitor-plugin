@@ -4,4 +4,4 @@ jenkins:
     - name: "24.04"
     - name: "Centos-7"
       properties:
-        - "forbiddenLabelProperty"
+        - "forbiddenLabel"
