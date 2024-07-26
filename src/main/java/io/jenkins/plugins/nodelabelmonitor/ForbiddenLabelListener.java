@@ -1,5 +1,6 @@
 package io.jenkins.plugins.nodelabelmonitor;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.FilePath;
@@ -10,6 +11,7 @@ import hudson.model.labels.LabelAtom;
 import hudson.node_monitors.NodeMonitor;
 import hudson.remoting.Channel;
 import hudson.slaves.ComputerListener;
+import hudson.slaves.OfflineCause;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +55,21 @@ public class ForbiddenLabelListener extends ComputerListener {
 
     @Override
     public void onConfigurationChange() {
+        refreshMonitor();
+    }
+
+    @Override
+    public void onOffline(@NonNull Computer c, OfflineCause cause) {
+        refreshMonitor();
+    }
+
+    @Override
+    public void onTemporarilyOffline(Computer c, OfflineCause cause) {
+        refreshMonitor();
+    }
+
+    @Override
+    public void onTemporarilyOnline(Computer c) {
         refreshMonitor();
     }
 

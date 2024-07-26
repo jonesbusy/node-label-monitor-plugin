@@ -1,6 +1,7 @@
 package io.jenkins.plugins.nodelabelmonitor;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.Computer;
@@ -53,12 +54,12 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
             }
         }
 
-        public LabelAtom monitorSynchronous(Computer c) throws IOException, InterruptedException {
+        public @Nullable LabelAtom monitorSynchronous(Computer c) throws IOException, InterruptedException {
             return monitor(c);
         }
 
         @Override
-        protected LabelAtom monitor(Computer c) throws IOException, InterruptedException {
+        protected @Nullable LabelAtom monitor(Computer c) throws IOException, InterruptedException {
             Node node = c.getNode();
             if (node == null) {
                 return null;
