@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Extension(ordinal = Integer.MAX_VALUE)
+@Extension
 public class ForbiddenLabelListener extends ComputerListener {
 
     private static final Logger LOGGER = Logger.getLogger(ForbiddenLabelListener.class.getName());
@@ -23,9 +23,6 @@ public class ForbiddenLabelListener extends ComputerListener {
     public void preOnline(Computer c, Channel channel, FilePath root, TaskListener listener)
             throws IOException, InterruptedException {
         refreshMonitor();
-        LOGGER.log(
-                Level.FINE,
-                String.format("preOnline() for node '%s' forbidden label. Monitor refreshed", c.getDisplayName()));
         Node node = c.getNode();
         if (node == null) {
             return;
@@ -57,7 +54,6 @@ public class ForbiddenLabelListener extends ComputerListener {
     @Override
     public void onConfigurationChange() {
         refreshMonitor();
-        LOGGER.log(Level.FINE, "onConfigurationChange() for forbidden label. Monitor refreshed");
     }
 
     private void refreshMonitor() {

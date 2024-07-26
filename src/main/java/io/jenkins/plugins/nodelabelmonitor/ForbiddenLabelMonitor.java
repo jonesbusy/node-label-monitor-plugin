@@ -45,7 +45,6 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
         }
 
         public LabelAtom monitorSynchronous(Computer c) throws IOException, InterruptedException {
-            LOGGER.log(Level.FINE, "Synchronous monitoring of forbidden labels");
             return monitor(c);
         }
 

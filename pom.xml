@@ -64,6 +64,8 @@
       <artifactId>test-harness</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Ensure it works with platform label assigned programatically -->
     <dependency>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>platformlabeler</artifactId>
