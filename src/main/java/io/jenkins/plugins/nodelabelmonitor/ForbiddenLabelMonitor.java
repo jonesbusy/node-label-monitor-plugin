@@ -2,6 +2,7 @@ package io.jenkins.plugins.nodelabelmonitor;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Computer;
 import hudson.model.Node;
 import hudson.model.labels.LabelAtom;
@@ -32,6 +33,14 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
             LOGGER.log(Level.WARNING, "Thread interrupted", e);
         }
         LOGGER.log(Level.FINE, "Label monitor updated");
+    }
+
+    @SuppressWarnings("unused") // jelly
+    public String toHtml(LabelAtom labelAtom) {
+        if (labelAtom == null) {
+            return "N/A";
+        }
+        return Util.wrapToErrorSpan(labelAtom.getDisplayName());
     }
 
     @Extension(ordinal = Integer.MAX_VALUE)
