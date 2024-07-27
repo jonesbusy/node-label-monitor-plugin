@@ -16,8 +16,6 @@ import hudson.slaves.OfflineCause;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import jenkins.model.Jenkins;
-import org.csanchez.jenkins.plugins.kubernetes.KubernetesComputer;
 
 @Extension
 public class ForbiddenLabelListener extends ComputerListener {
@@ -47,36 +45,29 @@ public class ForbiddenLabelListener extends ComputerListener {
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public void onOnline(Computer c, TaskListener listener) throws IOException, InterruptedException {
 
-        // Mark immediate offline if forbidden label is assigned
         ForbiddenLabelMonitor.DescriptorImpl descriptor =
                 NodeMonitor.all().get(ForbiddenLabelMonitor.DescriptorImpl.class);
+        if (descriptor == null) {
+            return;
+        }
         LabelAtom labelAtom = descriptor.monitorSynchronous(c);
 
+        // If forbidden label is assigned, mark offline or disconnect cloud computer if not monitor is not ignored
         if (labelAtom != null) {
 
             // Cloud computer
             if (c instanceof AbstractCloudComputer) {
-                LOGGER.fine(String.format("Node '%s' is a cloud computer", c.getName()));
-                if (Jenkins.get().getPlugin("kubernetes") != null) {
-                    if (c instanceof KubernetesComputer) {
-                        LOGGER.fine(String.format("Node '%s' is a Kubernetes computer", c.getName()));
-                        KubernetesComputer kubernetesComputer = (KubernetesComputer) c;
-                        kubernetesComputer.setLaunching(false);
-                        kubernetesComputer.setAcceptingTasks(true);
-                        descriptor.markOfflineIfNotIgnored(
-                                c, "Node is assigned a forbidden label: " + labelAtom.getDisplayName());
-                    }
-                } else {
-                    LOGGER.fine(String.format("Node '%s' is not a cloud computer", c.getName()));
-                    descriptor.markOfflineIfNotIgnored(
-                            c, "Node is assigned a forbidden label: " + labelAtom.getDisplayName());
-                }
+                LOGGER.fine(String.format("Node '%s' is not a cloud computer. Marking offline", c.getName()));
+                descriptor.disconnectIfNotIgnored(
+                        c,
+                        "Node is assigned a forbidden label will disconnect cloud computer: "
+                                + labelAtom.getDisplayName());
             }
             // Normal computer
             else {
                 LOGGER.fine(String.format("Node '%s' is not a cloud computer", c.getName()));
                 descriptor.markOfflineIfNotIgnored(
-                        c, "Node is assigned a forbidden label: " + labelAtom.getDisplayName());
+                        c, "Node is assigned a forbidden label " + labelAtom.getDisplayName());
             }
         }
     }

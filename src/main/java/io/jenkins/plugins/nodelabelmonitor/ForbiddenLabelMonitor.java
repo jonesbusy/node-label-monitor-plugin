@@ -12,6 +12,7 @@ import hudson.node_monitors.MonitorOfflineCause;
 import hudson.node_monitors.NodeMonitor;
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jenkinsci.Symbol;
@@ -48,9 +49,29 @@ public class ForbiddenLabelMonitor extends NodeMonitor {
     @Symbol("forbiddenLabel")
     public static class DescriptorImpl extends AbstractNodeMonitorDescriptor<LabelAtom> {
 
+        /**
+         * Mark temporarily offline a node if monitor is not ignored. Typically used for non-cloud computer
+         * @param c Computer
+         * @param message Message to display
+         */
         public void markOfflineIfNotIgnored(Computer c, String message) {
             if (!isIgnored()) {
                 markOffline(c, new ForbiddenLabelCause(message));
+            }
+        }
+
+        /**
+         * Disconnect a computer if monitor is not ignored. Typically used for cloud computer
+         * @param c Computer
+         * @param message Message to display
+         */
+        public void disconnectIfNotIgnored(Computer c, String message) {
+            if (!isIgnored()) {
+                try {
+                    c.disconnect(new ForbiddenLabelCause(message)).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    LOGGER.log(Level.WARNING, "Error while disconnecting computer", e);
+                }
             }
         }
 

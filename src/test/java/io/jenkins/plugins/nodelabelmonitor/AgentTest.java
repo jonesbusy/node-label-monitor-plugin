@@ -5,8 +5,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 
 import hudson.model.Computer;
+import hudson.model.Descriptor;
 import hudson.model.Label;
+import hudson.model.TaskListener;
+import hudson.slaves.AbstractCloudComputer;
+import hudson.slaves.AbstractCloudSlave;
+import hudson.slaves.ComputerLauncher;
+import java.io.IOException;
 import java.util.logging.Level;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -15,6 +22,31 @@ import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
 public class AgentTest {
+
+    private static class MockCloudAgent extends AbstractCloudSlave {
+
+        protected MockCloudAgent(@NotNull String name, String remoteFS, ComputerLauncher launcher)
+                throws Descriptor.FormException, IOException {
+            super(name, remoteFS, launcher);
+        }
+
+        @Override
+        public MockCloudComputer createComputer() {
+            return new MockCloudComputer(this);
+        }
+
+        @Override
+        protected void _terminate(TaskListener listener) throws IOException, InterruptedException {
+            return;
+        }
+    }
+
+    private static class MockCloudComputer extends AbstractCloudComputer<MockCloudAgent> {
+
+        public MockCloudComputer(MockCloudAgent slave) {
+            super(slave);
+        }
+    }
 
     @Rule
     public LoggerRule logs = new LoggerRule()

@@ -58,12 +58,6 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
-      <groupId>org.csanchez.jenkins.plugins</groupId>
-      <artifactId>kubernetes</artifactId>
-      <optional>true</optional>
-    </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>io.jenkins.configuration-as-code</groupId>
