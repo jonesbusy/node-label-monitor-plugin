@@ -8,9 +8,8 @@ import hudson.model.Computer;
 import hudson.model.Descriptor;
 import hudson.model.Label;
 import hudson.model.TaskListener;
-import hudson.slaves.AbstractCloudComputer;
-import hudson.slaves.AbstractCloudSlave;
-import hudson.slaves.ComputerLauncher;
+import hudson.slaves.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +62,14 @@ public class AgentTest {
     }
 
     @Test
+    public void shouldAcceptTasksForCloudAgent(JenkinsRule rule) throws Exception {
+        createCloudAgent("cloud0", Label.get("foobar"), rule, true);
+
+        // Computer should be online
+        assertThat(rule.getInstance().getComputer("cloud0").isOnline(), equalTo(true));
+    }
+
+    @Test
     public void shouldBeOfflineWithLabel(JenkinsRule rule) throws Exception {
         // Create a new forbidden label
         rule.getInstance().getLabelAtom("barfoo").getProperties().add(new ForbiddenLabelProperty());
@@ -71,6 +78,22 @@ public class AgentTest {
 
         // Computer should be offline
         Computer computer = rule.getInstance().getComputer("slave0");
+        assertThat(computer.isOffline(), equalTo(true));
+        assertThat(computer.getOfflineCause(), instanceOf(ForbiddenLabelMonitor.ForbiddenLabelCause.class));
+    }
+
+    @Test
+    public void shouldBeOfflineWithLabelAndCloudAgent(JenkinsRule rule) throws Exception {
+        // Create a new forbidden label
+        rule.getInstance().getLabelAtom("barfoo").getProperties().add(new ForbiddenLabelProperty());
+        assertThat(rule.getInstance().getLabelAtom("barfoo").getProperties().size(), equalTo(1));
+        createCloudAgent("cloud0", Label.get("barfoo"), rule, false);
+
+        // Wait a bit because the agent should be disconnected with a cause (will never gets online)
+        Thread.sleep(1000);
+
+        // Computer should be offline
+        Computer computer = rule.getInstance().getComputer("cloud0");
         assertThat(computer.isOffline(), equalTo(true));
         assertThat(computer.getOfflineCause(), instanceOf(ForbiddenLabelMonitor.ForbiddenLabelCause.class));
     }
@@ -86,5 +109,20 @@ public class AgentTest {
         Computer computer = rule.getInstance().getComputer("slave0");
         assertThat(computer.isOffline(), equalTo(true));
         assertThat(computer.getOfflineCause(), instanceOf(ForbiddenLabelMonitor.ForbiddenLabelCause.class));
+    }
+
+    private MockCloudAgent createCloudAgent(String nodeName, Label label, JenkinsRule rule, boolean waitOnline)
+            throws Exception {
+        MockCloudAgent slave = new MockCloudAgent(
+                nodeName,
+                (new File(rule.getInstance().getRootDir(), "agent-work-dirs/" + nodeName)).getAbsolutePath(),
+                rule.createComputerLauncher(null));
+        slave.setRetentionStrategy(RetentionStrategy.NOOP);
+        slave.setLabelString(label.getName());
+        rule.getInstance().addNode(slave);
+        if (waitOnline) {
+            rule.waitOnline(slave);
+        }
+        return slave;
     }
 }

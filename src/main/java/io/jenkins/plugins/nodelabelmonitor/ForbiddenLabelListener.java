@@ -57,7 +57,7 @@ public class ForbiddenLabelListener extends ComputerListener {
 
             // Cloud computer
             if (c instanceof AbstractCloudComputer) {
-                LOGGER.fine(String.format("Node '%s' is not a cloud computer. Marking offline", c.getName()));
+                LOGGER.fine(String.format("Node '%s' is a cloud computer. Marking offline directly", c.getName()));
                 descriptor.disconnectIfNotIgnored(
                         c,
                         "Node is assigned a forbidden label will disconnect cloud computer: "
