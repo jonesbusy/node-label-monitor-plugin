@@ -69,7 +69,7 @@
     <dependency>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>platformlabeler</artifactId>
-      <version>2617.v5444054f5e35</version>
+      <version>2734.v604521b_646b_b_</version>
       <scope>test</scope>
     </dependency>
 
