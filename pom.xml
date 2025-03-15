@@ -31,7 +31,8 @@
 
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
-    <jenkins.version>2.440.3</jenkins.version>
+    <jenkins.baseline>2.479</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
 
     <spotless.check.skip>false</spotless.check.skip>
@@ -41,8 +42,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.440.x</artifactId>
-        <version>3435.v238d66a_043fb_</version>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
+        <version>4440.v39a_9eb_b_c6b_4d</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
